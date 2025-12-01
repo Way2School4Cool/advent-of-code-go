@@ -16,6 +16,7 @@ func (d *Day1) Part1() int {
 	position := 50
 
 	fileData, _ := os.Open(inputFile)
+	defer fileData.Close()
 
 	line := bufio.NewScanner(fileData)
 	for line.Scan() {
@@ -90,7 +91,7 @@ func (d *Day1) Part2() int {
 				zeros++
 			}
 
-			println(fmt.Sprintf("Move: %s        Position: %d        Zeros: %d", move, position, zeros))
+			//println(fmt.Sprintf("Move: %s        Position: %d        Zeros: %d", move, position, zeros))
 
 			continue
 		}

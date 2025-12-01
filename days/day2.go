@@ -5,12 +5,12 @@ import (
 	"os"
 )
 
-type Day# struct{}
+type Day2 struct{}
 
-var day#File = "input/day2.txt"
+var day2File = "input/day2.txt"
 
-func (d *Day#) Part1() int {
-	fileData, _ := os.Open(day#File)
+func (d *Day2) Part1() int {
+	fileData, _ := os.Open(day2File)
 	defer fileData.Close()
 
 	line := bufio.NewScanner(fileData)
@@ -18,8 +18,8 @@ func (d *Day#) Part1() int {
 	return 0
 }
 
-func (d *Day#) Part2() int {
-	fileData, _ := os.Open(day#File)
+func (d *Day2) Part2() int {
+	fileData, _ := os.Open(day2File)
 	defer fileData.Close()
 
 	line := bufio.NewScanner(fileData)
