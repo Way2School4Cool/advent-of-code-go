@@ -1,3 +1,5 @@
+// Approx Time: 2h 15m
+
 package days
 
 import (
