@@ -2,14 +2,14 @@ package main
 
 import days "advent-of-code/days"
 
-var day = &days.Day2{}
+var day = &days.Day3{}
 
 func main() {
 	resultPart1 := day.Part1()
 	resultPart2 := day.Part2()
 
-	println("Day 1 - Part 1 Result:", resultPart1)
-	println("Day 1 - Part 2 Result:", resultPart2)
+	println("Day - Part 1 Result:", resultPart1)
+	println("Day - Part 2 Result:", resultPart2)
 }
 
 /*
