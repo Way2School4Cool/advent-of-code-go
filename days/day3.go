@@ -11,7 +11,7 @@ import (
 
 type Day3 struct{}
 
-var day3File = "input/day3example.txt"
+var day3File = "input/day3.txt"
 
 func (d *Day3) Part1() int {
 	fileData, _ := os.Open(day3File)
@@ -73,78 +73,56 @@ func (d *Day3) Part2() string {
 
 	for line.Scan() {
 		lineData := line.Text()
+		pos1 := -1
+		pos2 := -1
+		pos3 := -1
 
-		hundreds := 100
-		tens := 100
-		ones := 100
+		for i := 0; i < len(lineData)-2; i++ {
+			currentNumber, _ := strconv.Atoi(string(lineData[i]))
+			nextNumber, _ := strconv.Atoi(string(lineData[i+1]))
 
-		hPos := -1
-		tPos := -1
-		oPos := -1
+			if currentNumber < nextNumber || currentNumber == 1 {
+				print("current number:", currentNumber, " next number:", nextNumber, "\n")
 
-		hundredsFail := 100
-		tensFail := 100
-
-		for {
-			for i := 0; i < len(lineData); i++ {
-
-				// Look through the line backwards
-				currentNumber, _ := strconv.Atoi(string(lineData[i]))
-
-				if currentNumber < hundreds && (hundredsFail == 100 || currentNumber > hundredsFail) {
-
-					hPos = i
-					tPos = -1
-					oPos = -1
-
-					hundreds = currentNumber
-					tens = 100
-					ones = 100
-
-				} else if currentNumber < tens && (tensFail == 100 || currentNumber > tensFail) {
-					tPos = i
-					oPos = -1
-
-					tens = currentNumber
-					ones = 100
-
-				} else if currentNumber < ones {
-					oPos = i
-					ones = currentNumber
+				if pos1 == -1 {
+					pos1 = i
+					//println("Setting Pos 1 to ", pos1)
+				} else if pos2 == -1 {
+					pos2 = i
+					//println("Setting Pos 2 to ", pos2)
+				} else if pos3 == -1 {
+					pos3 = i
+					//println("Setting Pos 3 to ", pos3)
+					break
 				}
-
-			}
-
-			if tens == 100 {
-				hundredsFail = hundreds
-				hundreds = 100
-				hPos = -1
-			} else if ones == 100 {
-				tensFail = tens
-				tens = 100
-				hundreds = 100
-				hPos = -1
-				tPos = -1
-			} else {
-
-				println("Smallest number positions:", hPos, tPos, oPos)
-
-				println(lineData)
-
-				// remove all numbers at the positions
-				outputLine := lineData[:hPos] + lineData[hPos+1:tPos] + lineData[tPos+1:oPos] + lineData[oPos+1:]
-
-				println(outputLine)
-
-				unintTotal, _ := new(big.Int).SetString(outputLine, 10)
-				runningTotal.Add(runningTotal, unintTotal)
-
-				println(runningTotal.String(), "\n")
-
-				break
 			}
 		}
+
+		if pos3 == -1 {
+			pos3 = len(lineData) - 1
+			print("AAAAAAAAAAAAAAAAAA")
+		}
+		if pos2 == -1 {
+			pos2 = len(lineData) - 2
+		}
+		if pos1 == -1 {
+			pos1 = len(lineData) - 3
+		}
+
+		strippedLine := lineData[:pos1] + lineData[pos1+1:pos2] + lineData[pos2+1:pos3] + lineData[pos3+1:]
+
+		strippedLineBigInt := new(big.Int)
+		strippedLineBigInt.SetString(strippedLine, 10)
+
+		runningTotal.Add(runningTotal, strippedLineBigInt)
+
+		println(lineData)
+		println(strippedLine)
+		//println(runningTotal.String(), "\n")
 	}
 
 	return runningTotal.String()
 }
+
+//2222222322411112221272122222252212213222213415221122222152422222222222142321222222222122561232221
+//2222222322411112221272122222252212213222213415221122222152422222222222142321222222222122561232221
