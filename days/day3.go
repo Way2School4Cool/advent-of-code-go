@@ -4,14 +4,13 @@ package days
 
 import (
 	"bufio"
-	"math/big"
 	"os"
 	"strconv"
 )
 
 type Day3 struct{}
 
-var day3File = "input/day3.txt"
+var day3File = "input/day3example.txt"
 
 func (d *Day3) Part1() int {
 	fileData, _ := os.Open(day3File)
@@ -64,64 +63,64 @@ func (d *Day3) Part1() int {
 	return runningTotal
 }
 
-func (d *Day3) Part2() string {
+func (d *Day3) Part2() int {
 	fileData, _ := os.Open(day3File)
 	defer fileData.Close()
 	line := bufio.NewScanner(fileData)
 
-	runningTotal := big.NewInt(0)
+	runningTotal := 0
 
 	for line.Scan() {
 		lineData := line.Text()
-		pos1 := -1
-		pos2 := -1
-		pos3 := -1
 
-		for i := 0; i < len(lineData)-2; i++ {
-			currentNumber, _ := strconv.Atoi(string(lineData[i]))
-			nextNumber, _ := strconv.Atoi(string(lineData[i+1]))
+		currentLargest := -1
+		newList := []int{}
 
-			if currentNumber < nextNumber || currentNumber == 1 {
-				print("current number:", currentNumber, " next number:", nextNumber, "\n")
+		for {
+			largest := -1
+			positionOfLargest := -1
 
-				if pos1 == -1 {
-					pos1 = i
-					//println("Setting Pos 1 to ", pos1)
-				} else if pos2 == -1 {
-					pos2 = i
-					//println("Setting Pos 2 to ", pos2)
-				} else if pos3 == -1 {
-					pos3 = i
-					//println("Setting Pos 3 to ", pos3)
-					break
+			// Find largest number
+			for i := currentLargest + 1; i < len(lineData)-12; i++ {
+				currentNumber, _ := strconv.Atoi(string(lineData[i]))
+				if currentNumber > largest {
+					largest, _ = strconv.Atoi(string(lineData[i]))
+					positionOfLargest = i
+					currentLargest = i
 				}
 			}
+
+			print(largest)
+			newList = append(newList, largest)
+
+			// remake the line removing evething before the largest number found inclusive
+			lineData = lineData[positionOfLargest+1:]
+
+			if len(lineData) == 12 {
+				//combine the new list and the end of the old list to make the final number of 12 digits
+				lineData = lineData[len(newList):]
+				//newlist
+
+				var numberString string
+				for _, digit := range newList {
+					numberString += strconv.Itoa(digit)
+				}
+
+				print(newList, lineData)
+				// Join the string from newList with the remaining lineData
+				finalNumberString := numberString + lineData
+
+				// Convert the final 12-digit string to a number and add to the total
+				finalNumber, _ := strconv.ParseInt(finalNumberString, 10, 64)
+				runningTotal += int(finalNumber)
+
+				break
+			}
 		}
-
-		if pos3 == -1 {
-			pos3 = len(lineData) - 1
-			print("AAAAAAAAAAAAAAAAAA")
-		}
-		if pos2 == -1 {
-			pos2 = len(lineData) - 2
-		}
-		if pos1 == -1 {
-			pos1 = len(lineData) - 3
-		}
-
-		strippedLine := lineData[:pos1] + lineData[pos1+1:pos2] + lineData[pos2+1:pos3] + lineData[pos3+1:]
-
-		strippedLineBigInt := new(big.Int)
-		strippedLineBigInt.SetString(strippedLine, 10)
-
-		runningTotal.Add(runningTotal, strippedLineBigInt)
-
-		println(lineData)
-		println(strippedLine)
-		//println(runningTotal.String(), "\n")
 	}
 
-	return runningTotal.String()
+	return runningTotal
+
 }
 
 //2222222322411112221272122222252212213222213415221122222152422222222222142321222222222122561232221
