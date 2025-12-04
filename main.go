@@ -2,7 +2,7 @@ package main
 
 import days "advent-of-code/days"
 
-var day = &days.Day3{}
+var day = &days.Day4{}
 
 func main() {
 	resultPart1 := day.Part1()
