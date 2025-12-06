@@ -20,11 +20,16 @@ func (d *Day5) Part1() int {
 	line := bufio.NewScanner(fileData)
 	postSpace := false
 
-	freshItems := []int{}
+	//freshItems := []int{}
 	freshCount := 0
+
+	beginRanges := []int{}
+	endRanges := []int{}
 
 	for line.Scan() {
 		lineData := line.Text()
+
+		//print(lineData)
 
 		if lineData == "" {
 			postSpace = true
@@ -35,22 +40,20 @@ func (d *Day5) Part1() int {
 			beginItems, _ := strconv.Atoi(strings.Split(lineData, "-")[0])
 			endItems, _ := strconv.Atoi(strings.Split(lineData, "-")[1])
 
-			for beginItems <= endItems {
-				freshItems = append(freshItems, beginItems)
-				beginItems++
-			}
+			beginRanges = append(beginRanges, beginItems)
+			endRanges = append(endRanges, endItems)
 
 		} else {
 			currentItem, _ := strconv.Atoi(lineData)
-			for i := 0; i < len(freshItems); i++ {
-				if freshItems[i] == currentItem {
+			for i := 0; i < len(beginRanges); i++ {
+				if currentItem >= beginRanges[i] && currentItem <= endRanges[i] {
+					//println(currentItem)
+
 					freshCount++
 					break
 				}
 			}
-
 		}
-
 	}
 
 	//for i := 0; i < len(freshItems); i++ {
@@ -65,7 +68,75 @@ func (d *Day5) Part2() int {
 	defer fileData.Close()
 
 	line := bufio.NewScanner(fileData)
-	line.Scan()
+	postSpace := false
 
-	return 0
+	freshCount := 0
+
+	ranges := [][]int{}
+	row := 0
+
+	for line.Scan() {
+		lineData := line.Text()
+
+		//print(lineData)
+
+		if lineData == "" {
+			postSpace = true
+			continue
+		}
+
+		if !postSpace {
+
+			beginItems, _ := strconv.Atoi(strings.Split(lineData, "-")[0])
+			endItems, _ := strconv.Atoi(strings.Split(lineData, "-")[1])
+
+			innerSlice := []int{}
+			innerSlice = append(innerSlice, beginItems, endItems)
+
+			ranges = append(ranges, innerSlice)
+			row++
+
+		} else {
+			break
+		}
+	}
+
+	for rotations := 0; rotations < 20; rotations++ {
+		newRanges := [][]int{}
+
+		for i := 0; i < len(ranges); i++ {
+			matchFound := false
+
+			for j := 0; j < len(ranges); j++ {
+				if i != j && ranges[i][0] >= ranges[j][0] && ranges[i][0] <= ranges[j][1] {
+					matchFound = true
+					if ranges[i][1] <= ranges[j][1] {
+						//println(ranges[i][0], ranges[i][1], "within", ranges[j][0], ranges[j][1])
+
+					} else {
+						println(ranges[i][0], ranges[i][1], "partially within", ranges[j][0], ranges[j][1])
+						innerSlice := []int{}
+						innerSlice = append(innerSlice, ranges[i][0], ranges[j][1])
+						newRanges = append(newRanges, innerSlice)
+
+					}
+				}
+			}
+			if !matchFound {
+				println(ranges[i][1], "-", ranges[i][0], "=", ranges[i][1]-ranges[i][0])
+				innerSlice := []int{}
+				innerSlice = append(innerSlice, ranges[i][0], ranges[i][1])
+				newRanges = append(newRanges, innerSlice)
+
+			}
+		}
+
+		ranges = newRanges
+	}
+
+	for i := 0; i < len(ranges); i++ {
+		freshCount += (ranges[i][1] - ranges[i][0])
+	}
+
+	return freshCount
 }
