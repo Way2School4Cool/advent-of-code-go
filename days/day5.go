@@ -138,5 +138,7 @@ func (d *Day5) Part2() int {
 		freshCount += (ranges[i][1] - ranges[i][0])
 	}
 
+	freshCount += len(ranges)
+
 	return freshCount
 }
