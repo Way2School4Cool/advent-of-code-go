@@ -4,6 +4,8 @@ package days
 
 import (
 	"bufio"
+	"fmt"
+	"math/big"
 	"os"
 	"strconv"
 	"strings"
@@ -11,7 +13,7 @@ import (
 
 type Day6 struct{}
 
-var day6File = "input/day6example.txt"
+var day6File = "input/day6.txt"
 
 func (d *Day6) Part1() int {
 	fileData, _ := os.Open(day6File)
@@ -101,125 +103,82 @@ func (d *Day6) Part1() int {
 func (d *Day6) Part2() int {
 	fileData, _ := os.Open(day6File)
 	defer fileData.Close()
-	numOfLines := 0
-	positions := []int{}
-	array := [][]int{}
 	//vertArray := [][]int{}
-	file := []string{}
-	symbols := []byte{}
-	total := 0
+	var grid [][]rune
+	var total big.Int
+	total.SetInt64(0)
 
 	line := bufio.NewScanner(fileData)
 	for line.Scan() {
-		numOfLines++
 		lineData := line.Text()
+		lineRunes := []rune(lineData)
 
-		file = append(file, lineData)
+		grid = append(grid, lineRunes)
+
 	}
 
-	for i := 0; i < len(file[0]); i++ {
-		if file[len(file)-1][i] != ' ' {
+	numbers := []int{}
+	wipNumbers := ""
+	wipTotal := 0
+	symbol := ""
+	empties := 0
 
-			//println(i)
-			positions = append(positions, i)
-		}
-	}
+	for x := 0; x < len(grid[0]); x++ {
+		for y := 0; y < len(grid); y++ {
+			//print(string(grid[y][x]))
 
-	for i := 0; i < len(positions)-1; i++ {
-		var innerSlice = []int{}
-		for j := 0; j < numOfLines; j++ {
-			stringSpace := strings.Trim(file[j][positions[i]:positions[i+1]], " ")
-			numberSpace, _ := strconv.Atoi(stringSpace)
-			innerSlice = append(innerSlice, numberSpace)
-		}
-		array = append(array, innerSlice)
-		symbols = append(symbols, file[numOfLines-1][positions[i]])
-		//println(string(symbols[i]))
-	}
-
-	//last one is getting lost somewhere
-	val1, _ := strconv.Atoi(strings.Trim(file[0][positions[len(positions)-1]:], " "))
-	val2, _ := strconv.Atoi(strings.Trim(file[1][positions[len(positions)-1]:], " "))
-	val3, _ := strconv.Atoi(strings.Trim(file[2][positions[len(positions)-1]:], " "))
-	val4, _ := strconv.Atoi(strings.Trim(file[3][positions[len(positions)-1]:], " "))
-
-	symbols = append(symbols, file[numOfLines-1][positions[len(positions)-1]])
-
-	array = append(array, []int{val1, val2, val3, val4})
-
-	//println(len(array), len(symbols))
-
-	for i := 0; i < len(array); i++ {
-		pos1 := ""
-		pos2 := ""
-		pos3 := ""
-		pos4 := ""
-		thousandsNum, hundredsNum, tensNum, onesNum := 0, 0, 0, 0
-
-		for j := 0; j < len(array[i]); j++ {
-			if array[i][j] >= 1000 {
-				pos1 += string(strconv.Itoa(array[i][j])[0])
-				pos2 += string(strconv.Itoa(array[i][j])[1])
-				pos3 += string(strconv.Itoa(array[i][j])[2])
-				pos4 += string(strconv.Itoa(array[i][j])[3])
-			} else if array[i][j] >= 100 {
-				pos1 += "0"
-				pos2 += string(strconv.Itoa(array[i][j])[0])
-				pos3 += string(strconv.Itoa(array[i][j])[1])
-				pos4 += string(strconv.Itoa(array[i][j])[2])
-			} else if array[i][j] >= 10 {
-				pos1 += "0"
-				pos2 += "0"
-				pos3 += string(strconv.Itoa(array[i][j])[0])
-				pos4 += string(strconv.Itoa(array[i][j])[1])
-			} else if array[i][j] >= 1 {
-				pos1 += "0"
-				pos2 += "0"
-				pos3 += "0"
-				pos4 += string(strconv.Itoa(array[i][j])[0])
+			if string(grid[y][x]) == " " {
+				empties++
 			}
+			if empties == len(grid) || (y == len(grid)-1 && x == len(grid[0])-1) {
+				number, _ := strconv.Atoi(wipNumbers)
+				numbers = append(numbers, number)
+				wipNumbers = ""
 
-			thousandsNumTemp, _ := strconv.Atoi(pos1)
-			hundredsNumTemp, _ := strconv.Atoi(pos2)
-			tensNumTemp, _ := strconv.Atoi(pos3)
-			onesNumTemp, _ := strconv.Atoi(pos4)
+				if symbol == "+" {
+					for number := 0; number < len(numbers); number++ {
+						wipTotal += numbers[number]
+					}
+				}
+				if symbol == "*" {
+					for number := 0; number < len(numbers); number++ {
+						if numbers[number] == 0 {
+							numbers[number] = 1
+						}
+						if wipTotal == 0 {
+							wipTotal = 1
+						} else {
+							wipTotal *= numbers[number]
+						}
+					}
+				}
 
-			thousandsNum = thousandsNumTemp
-			hundredsNum = hundredsNumTemp
-			tensNum = tensNumTemp
-			onesNum = onesNumTemp
+				numbers = []int{}
+				var tempBigInt big.Int
+				total.Add(&total, tempBigInt.SetInt64(int64(wipTotal)))
+				fmt.Println("Calculating", symbol, "=", wipTotal, "          NEW TOTAL: ", total)
 
+				wipTotal = 0
+				symbol = ""
+
+			} else if string(grid[y][x]) == "+" {
+				symbol = "+"
+			} else if string(grid[y][x]) == "*" {
+				symbol = "*"
+			} else if string(grid[y][x]) != " " {
+				wipNumbers += string(grid[y][x])
+			}
 		}
 
-		println(thousandsNum, string(symbols[i]), hundredsNum, string(symbols[i]), tensNum, string(symbols[i]), onesNum)
-
-		if string(symbols[i]) == "+" {
-			total += thousandsNum + hundredsNum + tensNum + onesNum
-		} else {
-			total += thousandsNum * hundredsNum * tensNum * onesNum
-		}
+		empties = 0
+		number, _ := strconv.Atoi(wipNumbers)
+		println(number)
+		numbers = append(numbers, number)
+		wipNumbers = ""
 
 	}
 
-	/*
-		for i := 0; i < len(array); i++ {
-			lineTotal := 0
-
-			println(array[i][0], string(symbols[i]), array[i][1], string(symbols[i]), array[i][2], string(symbols[i]), array[i][3])
-
-			if string(symbols[i]) == "+" {
-				lineTotal = array[i][0] + array[i][1] + array[i][2] + array[i][3]
-			} else {
-				lineTotal = array[i][0] * array[i][1] * array[i][2] * array[i][3]
-			}
-
-			//println(lineTotal)
-
-			total += lineTotal
-			//println(lineTotal)
-
-		}
-	*/
-
-	return total
+	fmt.Println(total.String())
+	//return total
+	return 0
 }
