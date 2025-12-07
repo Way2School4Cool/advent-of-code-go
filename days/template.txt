@@ -12,21 +12,35 @@ type Day# struct{}
 var day#File = "input/day#.txt"
 
 func (d *Day#) Part1() int {
-	fileData, _ := os.Open(day#File)
+	fileData, _ := os.Open(day7File)
 	defer fileData.Close()
+	var grid [][]rune
 
 	line := bufio.NewScanner(fileData)
-	line.Scan()
+	for line.Scan() {
+		lineData := line.Text()
+		lineRunes := []rune(lineData)
+
+		grid = append(grid, lineRunes)
+
+	}
 
 	return 0
 }
 
 func (d *Day#) Part2() int {
-	fileData, _ := os.Open(day#File)
+	fileData, _ := os.Open(day7File)
 	defer fileData.Close()
+	var grid [][]rune
 
 	line := bufio.NewScanner(fileData)
-	line.Scan()
+	for line.Scan() {
+		lineData := line.Text()
+		lineRunes := []rune(lineData)
+
+		grid = append(grid, lineRunes)
+
+	}
 
 	return 0
 }
