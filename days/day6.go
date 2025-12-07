@@ -4,8 +4,6 @@ package days
 
 import (
 	"bufio"
-	"fmt"
-	"math/big"
 	"os"
 	"strconv"
 	"strings"
@@ -105,8 +103,7 @@ func (d *Day6) Part2() int {
 	defer fileData.Close()
 	//vertArray := [][]int{}
 	var grid [][]rune
-	var total big.Int
-	total.SetInt64(0)
+	total := 0
 
 	line := bufio.NewScanner(fileData)
 	for line.Scan() {
@@ -118,67 +115,54 @@ func (d *Day6) Part2() int {
 	}
 
 	numbers := []int{}
-	wipNumbers := ""
-	wipTotal := 0
 	symbol := ""
-	empties := 0
 
 	for x := 0; x < len(grid[0]); x++ {
+		wipNumbers := ""
+		isAllSpaces := true
 		for y := 0; y < len(grid); y++ {
-			//print(string(grid[y][x]))
+			char := grid[y][x]
 
-			if string(grid[y][x]) == " " {
-				empties++
-			}
-			if empties == len(grid) || (y == len(grid)-1 && x == len(grid[0])-1) {
-				number, _ := strconv.Atoi(wipNumbers)
-				numbers = append(numbers, number)
-				wipNumbers = ""
-
-				if symbol == "+" {
-					for number := 0; number < len(numbers); number++ {
-						wipTotal += numbers[number]
-					}
+			if char != ' ' {
+				isAllSpaces = false
+				if char == '+' {
+					symbol = "+"
+				} else if char == '*' {
+					symbol = "*"
+				} else {
+					wipNumbers += string(char)
 				}
-				if symbol == "*" {
-					for number := 0; number < len(numbers); number++ {
-						if numbers[number] == 0 {
-							numbers[number] = 1
-						}
-						if wipTotal == 0 {
-							wipTotal = 1
-						} else {
-							wipTotal *= numbers[number]
-						}
-					}
-				}
-
-				numbers = []int{}
-				var tempBigInt big.Int
-				total.Add(&total, tempBigInt.SetInt64(int64(wipTotal)))
-				fmt.Println("Calculating", symbol, "=", wipTotal, "          NEW TOTAL: ", total)
-
-				wipTotal = 0
-				symbol = ""
-
-			} else if string(grid[y][x]) == "+" {
-				symbol = "+"
-			} else if string(grid[y][x]) == "*" {
-				symbol = "*"
-			} else if string(grid[y][x]) != " " {
-				wipNumbers += string(grid[y][x])
 			}
 		}
 
-		empties = 0
-		number, _ := strconv.Atoi(wipNumbers)
-		println(number)
-		numbers = append(numbers, number)
-		wipNumbers = ""
+		// After iterating a full column, if we built a number, add it.
+		if wipNumbers != "" {
+			number, _ := strconv.Atoi(wipNumbers)
+			numbers = append(numbers, number)
+		}
 
+		// If the column was all spaces or it's the last column, perform calculation.
+		if isAllSpaces || x == len(grid[0])-1 {
+			if len(numbers) > 0 {
+				wipTotal := 0
+				if symbol == "*" {
+					wipTotal = 1
+				}
+
+				for _, num := range numbers {
+					if symbol == "+" {
+						wipTotal += num
+					} else if symbol == "*" {
+						wipTotal *= num
+					}
+				}
+				total += wipTotal
+			}
+			// Reset for the next group.
+			numbers = []int{}
+			symbol = ""
+		}
 	}
 
-	fmt.Println(total.String())
-	//return total
-	return 0
+	return total
 }
