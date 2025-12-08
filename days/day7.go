@@ -73,37 +73,37 @@ func (d *Day7) Part2() int {
 		grid = append(grid, lineRunes)
 	}
 
-	currBeams := []int{}
-	splits := 0
+	splits := []int{}
+	for y := 0; y < len(grid[0]); y++ {
+		splits = append(splits, 0)
+	}
 
 	for y := 0; y < len(grid); y++ {
 		for x := 0; x < len(grid[0]); x++ {
 			if string(grid[y][x]) == "S" {
-				currBeams = append(currBeams, x)
+				splits[x]++
 			} else {
-				if string(grid[y][x]) == "^" && slices.Contains(currBeams, x) {
-					posOfMatch := slices.Index(currBeams, x)
-					currBeams = append(currBeams[:posOfMatch], currBeams[posOfMatch+1:]...)
-
-					splits++
-
-					if !slices.Contains(currBeams, x-1) {
-						currBeams = append(currBeams, x-1)
-					}
-					if !slices.Contains(currBeams, x+1) {
-						currBeams = append(currBeams, x+1)
-					}
+				if string(grid[y][x]) == "^" && splits[x] > 0 {
+					splits[x-1] += splits[x]
+					splits[x+1] += splits[x]
+					splits[x] = 0
 				}
 			}
-			if slices.Contains(currBeams, x) {
-				print("|")
+			if splits[x] > 0 {
+				//print(splits[x])
 			} else {
-				print(string(grid[y][x]))
+				//print(string(grid[y][x]))
 			}
 
 		}
-		println()
+		//println()
 	}
 
-	return splits
+	totalSplits := 0
+
+	for _, v := range splits {
+		totalSplits += v
+	}
+
+	return totalSplits
 }
